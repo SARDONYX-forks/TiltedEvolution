@@ -39,9 +39,14 @@ jobs:
         # Checkout only if the tag was pushed to master
         run: (git rev-parse HEAD) -eq (git rev-parse origin/master) -and (git checkout master)
 
+      - name: Store version string
+        id: store-version
+        shell: pwsh
+        run: echo "version=$(git describe --tags)" >> $env:GITHUB_OUTPUT
+
       - name: Full STR Build
         uses: ./.github/actions/full-build
         with:
           mode: releasedbg
           arch: ${{ matrix.mode }}
-          artifact-name: ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.mode }}
+          str-version: ${{ steps.store-vesrion.outputs.version }}

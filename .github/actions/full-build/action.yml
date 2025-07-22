@@ -7,8 +7,8 @@ inputs:
   arch:
     description: "Build architecture (e.g., x64)"
     required: true
-  artifact-name:
-    description: "Name of the artifact to upload"
+  str-version:
+    description: "Version string of the artifact to upload"
     required: true
 
   config-options:
@@ -81,18 +81,14 @@ runs:
         rm str-build/SkyrimTogetherReborn/*Tests.exe
 
     # Upload artifact
-    - name: Store version string
-      shell: pwsh
-      run: echo "STR_VERSION=$(git describe --tags)" >> $env:GITHUB_ENV
-
     - name: Upload playable build
       uses: actions/upload-artifact@v4
       with:
-        name: Skyrim Together Build (${{ env.STR_VERSION }})
+        name: Skyrim Together Build (${{ inputs.str-version }})
         path: str-build/
 
     - name: Upload debug symbols
       uses: actions/upload-artifact@v4
       with:
-        name: Debug Symbols (${{ env.STR_VERSION }})
+        name: Debug Symbols (${{ inputs.str-version }})
         path: str-pdb/
