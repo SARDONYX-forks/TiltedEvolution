@@ -15,7 +15,7 @@ jobs:
         mode: [debug]
 
     runs-on: ${{ matrix.os }}
-    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
 
     steps:
     - uses: actions/checkout@v4
