@@ -30,17 +30,17 @@ runs:
         package-cache: true
 
     - name: Configure xmake and install dependencies
-      shell: bash
+      shell: pwsh
       run: xmake config --arch=${{ inputs.arch }} --mode=${{ inputs.mode }} --yes -vD ${{ inputs.config-options }}
 
     # Build the game
     - name: Build with xmake
-      shell: bash
+      shell: pwsh
       run: xmake -y
 
     # Create distrib
     - name: Output STR binaries via xmake
-      shell: bash
+      shell: pwsh
       run: xmake install -o distrib
 
     # Building the Together UI
