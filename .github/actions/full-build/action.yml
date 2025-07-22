@@ -64,7 +64,7 @@ runs:
 
     # Package everything, organize directories
     - name: Package binaries and assets
-      shell: bash
+      shell: pwsh
       run: |
         mkdir -p str-build/SkyrimTogetherReborn
         mv build/windows/${{ matrix.arch }}/${{ matrix.mode }}/* str-build/SkyrimTogetherReborn
@@ -73,7 +73,7 @@ runs:
         cp -r GameFiles/Skyrim/* str-build/
 
     - name: Remove unnecessary build files, keep .pdb
-      shell: bash
+      shell: pwsh
       run: |
         mkdir str-pdb
         mv str-build/SkyrimTogetherReborn/SkyrimTogether.pdb, str-build/SkyrimTogetherReborn/SkyrimTogetherServer.pdb str-pdb
@@ -82,7 +82,7 @@ runs:
 
     # Upload artifact
     - name: Store version string
-      shell: bash
+      shell: pwsh
       run: echo "STR_VERSION=$(git describe --tags)" >> $env:GITHUB_ENV
 
     - name: Upload playable build
