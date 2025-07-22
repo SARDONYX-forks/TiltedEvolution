@@ -1,0 +1,9 @@
+# xmake config --arch=x64 --mode=release --yes -vD
+CompileFlags:
+    # Output compile_commands.json
+    # 1. git submodule update --init --recursive --depth=1
+    # 2. xmake project -k compile_commands --lsp=clangd --output=build
+    CompilationDatabase: "./build"
+
+    # clangd bug work around: https://github.com/clangd/clangd/issues/1850#issuecomment-1841985906
+    Add: ["-std:latest", "/clang:-std=c++20"]
