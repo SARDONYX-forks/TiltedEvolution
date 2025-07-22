@@ -77,7 +77,7 @@ runs:
       run: |
         # Delete all other .pdb files
         Get-ChildItem str-build/SkyrimTogetherReborn/*.pdb | ForEach-Object {
-          if ($_ -notmatch "SkyrimTogether(pServer)?\.pdb") {
+          if ($_ -notmatch "SkyrimTogether(Server)?\.pdb") {
             Remove-Item $_
           }
         }
