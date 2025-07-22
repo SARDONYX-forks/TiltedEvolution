@@ -33,3 +33,4 @@ jobs:
           mode: ${{ matrix.mode }}
           arch: ${{ matrix.arch }}
           artifact-name: ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.mode }}
+          config-options: "--vs_sdkver=10.0.19041.0"

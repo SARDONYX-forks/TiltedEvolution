@@ -11,6 +11,11 @@ inputs:
     description: "Name of the artifact to upload"
     required: true
 
+  config-options:
+    description: "Additional configuration options for xmake"
+    required: false
+    default: ""
+
 runs:
   using: "composite"
   steps:
@@ -26,7 +31,7 @@ runs:
 
     - name: Configure xmake and install dependencies
       shell: bash
-      run: xmake config --arch=${{ inputs.arch }} --mode=${{ inputs.mode }} --yes -vD
+      run: xmake config --arch=${{ inputs.arch }} --mode=${{ inputs.mode }} --yes -vD ${{ inputs.config-options }}
 
     # Build the game
     - name: Build with xmake
