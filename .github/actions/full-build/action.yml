@@ -75,10 +75,21 @@ runs:
     - name: Remove unnecessary build files, keep .pdb
       shell: pwsh
       run: |
+        # Delete all other .pdb files
+        Get-ChildItem str-build/SkyrimTogetherReborn/*.pdb | ForEach-Object {
+          if ($_ -notmatch "SkyrimTogether(pServer)?\.pdb") {
+            Remove-Item $_
+          }
+        }
+
+        # Clean up other unnecessary files
+        Remove-Item str-build/SkyrimTogetherReborn/*.lib
+        Remove-Item str-build/SkyrimTogetherReborn/*.exp
+        Remove-Item str-build/SkyrimTogetherReborn/*Tests.exe
+
         mkdir str-pdb
-        mv str-build/SkyrimTogetherReborn/SkyrimTogether.pdb, str-build/SkyrimTogetherReborn/SkyrimTogetherServer.pdb str-pdb
-        rm str-build/SkyrimTogetherReborn/*.pdb, str-build/SkyrimTogetherReborn/*.lib, str-build/SkyrimTogetherReborn/*.exp
-        rm str-build/SkyrimTogetherReborn/*Tests.exe
+        mv str-build/SkyrimTogetherReborn/SkyrimTogether.pdb str-pdb
+        mv str-build/SkyrimTogetherReborn/SkyrimTogetherServer.pdb str-pdb
 
     # Upload artifact
     - name: Upload playable build
