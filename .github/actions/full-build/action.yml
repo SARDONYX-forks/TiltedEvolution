@@ -87,16 +87,19 @@ runs:
         Remove-Item str-build/SkyrimTogetherReborn/*.exp
         Remove-Item str-build/SkyrimTogetherReborn/*Tests.exe
 
-        mkdir str-pdb
-        mv str-build/SkyrimTogetherReborn/SkyrimTogether.pdb str-pdb
-        mv str-build/SkyrimTogetherReborn/SkyrimTogetherServer.pdb str-pdb
-
     # Upload artifact
     - name: Upload playable build
       uses: actions/upload-artifact@v4
       with:
         name: Skyrim Together Build (${{ inputs.str-version }})
         path: str-build/
+
+    - name: Move debug symbols
+      shell: pwsh
+      run: |
+        mkdir str-pdb
+        mv str-build/SkyrimTogetherReborn/SkyrimTogether.pdb str-pdb
+        mv str-build/SkyrimTogetherReborn/SkyrimTogetherServer.pdb str-pdb
 
     - name: Upload debug symbols
       uses: actions/upload-artifact@v4
