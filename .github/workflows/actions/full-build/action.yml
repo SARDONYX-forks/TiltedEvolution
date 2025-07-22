@@ -1,0 +1,93 @@
+name: "Full STR Build and Upload"
+description: "Builds native binaries + UI, and uploads them as artifacts"
+inputs:
+  mode:
+    description: "Build mode (release/releasedbg)"
+    required: true
+  arch:
+    description: "Build architecture (e.g., x64)"
+    required: true
+  artifact-name:
+    description: "Name of the artifact to upload"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup xmake
+      uses: xmake-io/github-action-setup-xmake@v1
+      with:
+        xmake-version: "2.9.8"
+        actions-cache-key: ${{ inputs.mode }}
+        build-cache-key: ${{ inputs.mode }}
+        build-cache: true
+        package-cache-key: ${{ inputs.mode }}
+        package-cache: true
+
+    - name: Configure xmake and install dependencies
+      shell: bash
+      run: xmake config --arch=${{ inputs.arch }} --mode=${{ inputs.mode }} --yes -vD
+
+    # Build the game
+    - name: Build with xmake
+      shell: bash
+      run: xmake -y
+
+    # Create distrib
+    - name: Output STR binaries via xmake
+      shell: bash
+      run: xmake install -o distrib
+
+    # Building the Together UI
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/iron
+        cache-dependency-path: Code/skyrim_ui/pnpm-lock.yaml
+        cache: "pnpm"
+
+    - name: Build the UI
+      shell: bash
+      run: |
+        pnpm --prefix Code/skyrim_ui/ install
+        pnpm --prefix Code/skyrim_ui/ deploy:production
+
+    # Package everything, organize directories
+    - name: Package binaries and assets
+      shell: bash
+      run: |
+        mkdir -p str-build/SkyrimTogetherReborn
+        mv build/windows/${{ matrix.arch }}/${{ matrix.mode }}/* str-build/SkyrimTogetherReborn
+        cp -Force -Recurse distrib/bin/* str-build/SkyrimTogetherReborn
+        cp -r Code/skyrim_ui/dist/UI str-build/SkyrimTogetherReborn
+        cp -r GameFiles/Skyrim/* str-build/
+
+    - name: Remove unnecessary build files, keep .pdb
+      shell: bash
+      run: |
+        mkdir str-pdb
+        mv str-build/SkyrimTogetherReborn/SkyrimTogether.pdb, str-build/SkyrimTogetherReborn/SkyrimTogetherServer.pdb str-pdb
+        rm str-build/SkyrimTogetherReborn/*.pdb, str-build/SkyrimTogetherReborn/*.lib, str-build/SkyrimTogetherReborn/*.exp
+        rm str-build/SkyrimTogetherReborn/*Tests.exe
+
+    # Upload artifact
+    - name: Store version string
+      shell: bash
+      run: echo "STR_VERSION=$(git describe --tags)" >> $env:GITHUB_ENV
+
+    - name: Upload playable build
+      uses: actions/upload-artifact@v4
+      with:
+        name: Skyrim Together Build (${{ env.STR_VERSION }})
+        path: str-build/
+
+    - name: Upload debug symbols
+      uses: actions/upload-artifact@v4
+      with:
+        name: Debug Symbols (${{ env.STR_VERSION }})
+        path: str-pdb/

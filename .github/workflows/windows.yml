@@ -27,29 +27,9 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --force --recursive --depth=1
 
-      - name: Setup xmake
-        uses: xmake-io/github-action-setup-xmake@v1
+      - name: Full STR Build
+        uses: ./.github/actions/full-build
         with:
-          xmake-version: "2.9.8"
-          actions-cache-key: ${{ matrix.mode }}
-          build-cache-key: ${{ matrix.mode }}
-          build-cache: true
-          package-cache-key: ${{ matrix.mode }}
-          package-cache: true
-
-      - name: Configure xmake and install dependencies
-        run: |
-          xmake.exe config --arch=${{ matrix.arch }} --mode=${{ matrix.mode }} --yes --vs_sdkver=10.0.19041.0 -vD
-
-      - name: Build with xmake
-        run: xmake.exe
-
-      - name: Install binaries to packaged/
-        run: xmake.exe install -o packaged
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.mode }}
-          path: |
-            packaged/bin/**
+          mode: ${{ matrix.mode }}
+          arch: ${{ matrix.arch }}
+          artifact-name: ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.mode }}
